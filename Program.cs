@@ -20,12 +20,16 @@ namespace LibrarySystem
     internal class Program
     {
         static List<Book> books = new List<Book>();
+        static bool hasLibraryCard = false;
 
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-            Console.WriteLine("Welcome to Library Management System");
+            Console.WriteLine("=================================");
+            Console.WriteLine(" Welcome to Library Management");
+            Console.WriteLine("=================================");
+
             Console.Write("Enter 'u' for User or 'l' for Librarian: ");
             string role = Console.ReadLine().ToLower();
 
@@ -54,8 +58,8 @@ namespace LibrarySystem
                 Console.WriteLine("2. Remove Book");
                 Console.WriteLine("3. Display All Books");
                 Console.WriteLine("4. Exit");
-                Console.Write("Choice: ");
 
+                Console.Write("Choice: ");
                 string choice = Console.ReadLine();
 
                 switch (choice)
@@ -63,15 +67,19 @@ namespace LibrarySystem
                     case "1":
                         AddNewBook();
                         break;
+
                     case "2":
                         DeleteBook();
                         break;
+
                     case "3":
                         ShowAllBooks();
                         break;
+
                     case "4":
                         exit = true;
                         break;
+
                     default:
                         Console.WriteLine("Wrong choice, try again.");
                         break;
@@ -81,37 +89,84 @@ namespace LibrarySystem
 
         static void RunUserMenu()
         {
-            Console.WriteLine("\n--- User Panel ---");
-            Console.WriteLine("1. Get Library Card");
-            Console.WriteLine("2. Exit");
-            Console.Write("Choice: ");
+            bool exit = false;
 
-            string choice = Console.ReadLine();
+            while (!exit)
+            {
+                Console.WriteLine("\n--- User Panel ---");
+                Console.WriteLine("1. Get Library Card");
+                Console.WriteLine("2. Display Books");
+                Console.WriteLine("3. Borrow Book");
+                Console.WriteLine("4. Exit");
 
-            if (choice == "1")
-            {
-                Console.WriteLine("Card issued successfully! Welcome aboard.");
+                Console.Write("Choice: ");
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        GetLibraryCard();
+                        break;
+
+                    case "2":
+                        ShowAllBooks();
+                        break;
+
+                    case "3":
+                        BorrowBook();
+                        break;
+
+                    case "4":
+                        exit = true;
+                        break;
+
+                    default:
+                        Console.WriteLine("Wrong choice, try again.");
+                        break;
+                }
             }
-            else
+        }
+
+        static void GetLibraryCard()
+        {
+            if (hasLibraryCard)
             {
-                Console.WriteLine("Goodbye.");
+                Console.WriteLine("You already have a library card.");
+                return;
             }
+
+            Console.Write("Enter your name: ");
+            string name = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                Console.WriteLine("Error: Name cannot be empty.");
+                return;
+            }
+
+            hasLibraryCard = true;
+
+            Console.WriteLine("\nLibrary card issued successfully!");
+            Console.WriteLine($"Welcome, {name}!");
         }
 
         static void AddNewBook()
         {
             Console.Write("Book Title: ");
             string title = Console.ReadLine();
+
             Console.Write("Author Name: ");
             string author = Console.ReadLine();
 
-            if (title == "" || author == "")
+            if (string.IsNullOrWhiteSpace(title) ||
+                string.IsNullOrWhiteSpace(author))
             {
                 Console.WriteLine("Error: Inputs cannot be empty.");
                 return;
             }
 
             books.Add(new Book(title, author));
+
             Console.WriteLine("Book added successfully.");
         }
 
@@ -121,11 +176,15 @@ namespace LibrarySystem
             string title = Console.ReadLine();
 
             Book foundBook = null;
-            foreach (var b in books)
+
+            foreach (var book in books)
             {
-                if (b.Title.ToLower() == title.ToLower())
+                if (string.Equals(
+                    book.Title,
+                    title,
+                    StringComparison.OrdinalIgnoreCase))
                 {
-                    foundBook = b;
+                    foundBook = book;
                     break;
                 }
             }
@@ -144,6 +203,7 @@ namespace LibrarySystem
         static void ShowAllBooks()
         {
             Console.WriteLine("\n--- Books List ---");
+
             if (books.Count == 0)
             {
                 Console.WriteLine("No books available right now.");
@@ -152,7 +212,57 @@ namespace LibrarySystem
 
             for (int i = 0; i < books.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. Title: {books[i].Title} | Author: {books[i].Author} | Available: {books[i].IsAvailable}");
+                string status = books[i].IsAvailable
+                    ? "Available"
+                    : "Borrowed";
+
+                Console.WriteLine(
+                    $"{i + 1}. Title: {books[i].Title} | " +
+                    $"Author: {books[i].Author} | " +
+                    $"Status: {status}");
+            }
+        }
+
+        static void BorrowBook()
+        {
+            if (!hasLibraryCard)
+            {
+                Console.WriteLine(
+                    "You need a library card before borrowing a book.");
+                return;
+            }
+
+            ShowAllBooks();
+
+            Console.Write("\nEnter book title to borrow: ");
+            string title = Console.ReadLine();
+
+            Book foundBook = null;
+
+            foreach (var book in books)
+            {
+                if (string.Equals(
+                    book.Title,
+                    title,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    foundBook = book;
+                    break;
+                }
+            }
+
+            if (foundBook == null)
+            {
+                Console.WriteLine("Book not found.");
+            }
+            else if (!foundBook.IsAvailable)
+            {
+                Console.WriteLine("This book is already borrowed.");
+            }
+            else
+            {
+                foundBook.IsAvailable = false;
+                Console.WriteLine("Book borrowed successfully.");
             }
         }
     }
