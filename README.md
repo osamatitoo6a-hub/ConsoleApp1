@@ -28,3 +28,13 @@ A C# Console Application built to manage library operations efficiently. Designe
 1. Clone the repository:
    ```bash
    git clone [https://github.com/osamatitoo6a-hub/ConsoleApp1.git](https://github.com/osamatitoo6a-hub/ConsoleApp1.git)
+   ---
+
+## 👤 Author
+
+**Osama Mohamed Khalaf Hamida**
+- 🎓 **Faculty:** Computers & Information
+- 💻 **Department:** Software Engineering
+- 🆔 **Student ID:** 24410137
+- 🐙 **GitHub:** [@osamatitoo6a-hub](https://github.com/osamatitoo6a-hub)
+-
